@@ -1,0 +1,81 @@
+
+        :root {
+            --primary-color: #2c3e50;
+            --secondary-color: #3498db;
+            --accent-color: #e74c3c;
+            --light-color: #ecf0f1;
+            --success-color: #2ecc71;
+        }
+        
+        .bg-primary-custom {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color)) !important;
+        }
+        
+        .btn-primary-custom {
+            background-color: var(--secondary-color);
+            border-color: var(--secondary-color);
+        }
+        
+        .btn-primary-custom:hover {
+            background-color: #2980b9;
+            border-color: #2980b9;
+        }
+        
+        .btn-danger-custom {
+            background-color: var(--accent-color);
+            border-color: var(--accent-color);
+        }
+        
+        .btn-danger-custom:hover {
+            background-color: #c0392b;
+            border-color: #c0392b;
+        }
+        
+        .card {
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+            border: none;
+            transition: transform 0.3s;
+        }
+        
+        .card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .summary-card {
+            background-color: var(--light-color);
+        }
+        
+        .table-responsive {
+            max-height: 500px;
+        }
+        
+        .table thead th {
+            background-color: var(--primary-color);
+            color: white;
+            position: sticky;
+            top: 0;
+        }
+        
+        .invalid-feedback {
+            display: none;
+        }
+        
+        .was-validated .form-control:invalid ~ .invalid-feedback,
+        .was-validated .form-select:invalid ~ .invalid-feedback {
+            display: block;
+        }
+        
+        .sticky-top {
+            z-index: 1020;
+        }
+        
+        .export-section {
+            border-top: 1px solid #dee2e6;
+            padding-top: 1.5rem;
+        }
+        
+        @media (max-width: 768px) {
+            .display-4 {
+                font-size: 2rem;
+            }
+        }

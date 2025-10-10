@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cotizador de Créditos Asefimex</title>
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="style.css">
+    
+    <!-- jsPDF -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
+
+</head>
+
+<body>
+    <!-- Header -->
+    <header class="bg-primary-custom text-white py-4 mb-4">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-md-8">
+                    <h4 class="display-4 fw-bold"><i class="bi bi-car-front-fill me-3"></i>Cotizador de Créditos</h4>
+                    <p class="lead">Calcula tu financiamiento y plan de pagos de forma rápida y sencilla</p>
+                </div>
+                <div class="col-md-4 text-md-end">
+                    <div class="bg-light text-dark rounded p-3 d-inline-block">
+                        <small class="text-muted d-block">Cotización válida hasta:</small>
+                        <strong id="valid-until">--/--/----</strong>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="container">
+        <div class="row g-4">
+            <!-- Formulario -->
+            <div class="col-lg-5">
+                <div class="card">
+                    <div class="card-header bg-primary text-white">
+                        <h2 class="h4 mb-0"><i class="bi bi-pencil-square me-2"></i>Datos del Crédito</h2>
+                    </div>
+                    <div class="card-body">
+                        <form id="loan-form" class="needs-validation" novalidate>
+                            <div class="mb-3">
+                                <label for="car-type" class="form-label">Tipo de Auto</label>
+                                <select class="form-select" id="car-type" required>
+                                    <option value="" selected disabled>Selecciona un tipo</option>
+                                    <option value="compacto">Compacto</option>
+                                    <option value="sedan">Sedán</option>
+                                    <option value="suv">SUV</option>
+                                    <option value="pickup">Pickup</option>
+                                    <option value="lujo">Lujo</option>
+                                </select>
+                                <div class="invalid-feedback">
+                                    Debes seleccionar un tipo de auto
+                                </div>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="car-value" class="form-label">Valor del Auto ($)</label>
+                                <div class="input-group">
+                                    <span class="input-group-text">$</span>
+                                    <input type="number" class="form-control" id="car-value" min="20000"  placeholder="Ej: 20000" required>
+                                </div>
+                                <div class="invalid-feedback">
+                                    El valor debe ser mayor a $10,000
+                                </div>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="down-payment" class="form-label">Enganche ($)</label>
+                                <div class="input-group">
+                                    <span class="input-group-text">$</span>
+                                    <input type="number" class="form-control" id="down-payment" min="0" placeholder="Ej: 50000" required>
+                                </div>
+                                <div class="invalid-feedback" id="down-payment-error">
+                                    El enganche no puede ser mayor al valor del auto
+                                </div>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="loan-term" class="form-label">Plazo de Financiamiento</label>
+                                <select class="form-select" id="loan-term" required>
+                                    <option value="" selected disabled>Selecciona un plazo</option>
+                                    <option value="12">12 meses</option>
+                                    <option value="24">24 meses</option>
+                                    <option value="36">36 meses</option>
+                                    <option value="48">48 meses</option>
+                                    <option value="60">60 meses</option>
+                                    <option value="72">72 meses</option>
+                                    <option value="84">84 meses</option>
+                                    <option value="92">92 meses</option>
+                                </select>
+                                <div class="invalid-feedback">
+                                    Debes seleccionar un plazo
+                                </div>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="payment-frequency" class="form-label">Frecuencia de Pagos</label>
+                                <select class="form-select" id="payment-frequency" required>
+                                    <option value="" selected disabled>Selecciona una frecuencia</option>
+                                    <!-- <option value="semanal">Semanal</option> -->
+                                    <option value="quincenal">Quincenal</option>
+                                    <option value="mensual">Mensual</option>
+                                    <option value="trimestral">Trimestral</option>
+                                    <option value="semestral">Semestral</option>
+                                    <option value="anual">Anual</option>
+                                </select>
+                                <div class="invalid-feedback">
+                                    Debes seleccionar una frecuencia de pagos
+                                </div>
+                            </div>
+                            
+                            <div class="mb-4">
+                                <label for="interest-rate" class="form-label">Tasa de Interés Anual (%)</label>
+                                <div class="input-group">
+                                    <input type="number" class="form-control" id="interest-rate" min="1" max="76" step="0.1" value="12" required>
+                                    <span class="input-group-text">%</span>
+                                </div>
+                                <div class="invalid-feedback">
+                                    La tasa debe estar entre 1% y 30%
+                                </div>
+                            </div>
+                            
+                            <div class="d-grid gap-2">
+                                <button type="submit" class="btn btn-primary-custom btn-lg">
+                                    <i class="bi bi-calculator me-2"></i>Calcular Crédito
+                                </button>
+                                <button type="reset" class="btn btn-secondary btn-lg">
+                                    <i class="bi bi-arrow-clockwise me-2"></i>Limpiar Formulario
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                
+                <!-- Información adicional -->
+                <div class="card mt-4">
+                    <div class="card-header bg-info text-white">
+                        <h3 class="h5 mb-0"><i class="bi bi-info-circle me-2"></i>Información Importante</h3>
+                    </div>
+                    <div class="card-body">
+                        <ul class="list-unstyled">
+                            <li class="mb-2"><i class="bi bi-check-circle text-success me-2"></i>Los cálculos son estimados</li>
+                            <li class="mb-2"><i class="bi bi-check-circle text-success me-2"></i>La tasa de interés puede variar</li>
+                            <li class="mb-2"><i class="bi bi-check-circle text-success me-2"></i>Consulte términos y condiciones</li>
+                            <li><i class="bi bi-check-circle text-success me-2"></i>Exporte su cotización en PDF</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Resultados -->
+            <div class="col-lg-7">
+                <div class="card">
+                    <div class="card-header bg-success text-white">
+                        <h2 class="h4 mb-0"><i class="bi bi-graph-up me-2"></i>Resultados de la Cotización</h2>
+                    </div>
+                    <div class="card-body">
+                        <!-- Resumen -->
+                        <div id="results-summary" style="display: none;">
+                            <div class="row g-3 mb-4">
+                                <div class="col-md-6">
+                                    <div class="card summary-card h-100">
+                                        <div class="card-body">
+                                            <h5 class="card-title text-primary">Resumen del Crédito</h5>
+                                            <div class="d-flex justify-content-between border-bottom pb-2 mb-2">
+                                                <span>Valor del Auto:</span>
+                                                <strong id="summary-car-value">$0</strong>
+                                            </div>
+                                            <div class="d-flex justify-content-between border-bottom pb-2 mb-2">
+                                                <span>Enganche:</span>
+                                                <strong id="summary-down-payment">$0</strong>
+                                            </div>
+                                            <div class="d-flex justify-content-between border-bottom pb-2 mb-2">
+                                                <span>Monto a Financiar:</span>
+                                                <strong id="summary-loan-amount">$0</strong>
+                                            </div>
+                                            <div class="d-flex justify-content-between border-bottom pb-2 mb-2">
+                                                <span>Plazo:</span>
+                                                <strong id="summary-loan-term">0 meses</strong>
+                                            </div>
+                                            <div class="d-flex justify-content-between">
+                                                <span>Frecuencia:</span>
+                                                <strong id="summary-payment-frequency">-</strong>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="card summary-card h-100">
+                                        <div class="card-body">
+                                            <h5 class="card-title text-primary">Detalles de Pago</h5>
+                                            <div class="d-flex justify-content-between border-bottom pb-2 mb-2">
+                                                <span>Tasa de Interés:</span>
+                                                <strong id="summary-interest-rate">0%</strong>
+                                            </div>
+                                            <div class="d-flex justify-content-between border-bottom pb-2 mb-2">
+                                                <span>Pago por Periodo:</span>
+                                                <strong id="summary-payment-amount">$0</strong>
+                                            </div>
+                                            <div class="d-flex justify-content-between border-bottom pb-2 mb-2">
+                                                <span>Total a Pagar:</span>
+                                                <strong id="summary-total-payment">$0</strong>
+                                            </div>
+                                            <div class="d-flex justify-content-between border-bottom pb-2 mb-2">
+                                                <span>Intereses Totales:</span>
+                                                <strong id="summary-total-interest">$0</strong>
+                                            </div>
+                                            <div class="d-flex justify-content-between fw-bold text-success">
+                                                <span>Coste Total:</span>
+                                                <strong id="summary-total-cost">$0</strong>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Tabla de amortización -->
+                            <div id="payment-table-container" style="display: none;">
+                                <h3 class="h5 mb-3"><i class="bi bi-table me-2"></i>Tabla de Amortización</h3>
+                                <div class="table-responsive">
+                                    <table class="table table-striped table-hover table-sm" id="payment-table">
+                                        <thead class="sticky-top">
+                                            <tr>
+                                                <th>No. Pago</th>
+                                                <th>Fecha</th>
+                                                <th>Pago</th>
+                                                <th>Interés</th>
+                                                <th>Capital</th>
+                                                <th>Saldo Restante</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="payment-table-body">
+                                            <!-- Las filas se generarán dinámicamente -->
+                                        </tbody>
+                                    </table>
+                                </div>
+                                
+                                <!-- Exportación -->
+                                <div class="export-section mt-4">
+                                    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                                        <button id="export-pdf" class="btn btn-danger-custom me-md-2">
+                                            <i class="bi bi-file-earmark-pdf me-2"></i>Exportar a PDF
+                                        </button>
+                                        <button id="print-results" class="btn btn-outline-secondary">
+                                            <i class="bi bi-printer me-2"></i>Imprimir
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Estado inicial -->
+                        <div id="no-results" class="text-center py-5">
+                            <i class="bi bi-calculator display-1 text-muted"></i>
+                            <h3 class="h4 text-muted mt-3">Ingresa los datos del crédito</h3>
+                            <p class="text-muted">Completa el formulario para ver la cotización</p>
+                        </div>
+                    </div>
+                </div>
+                
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-dark text-white py-4 mt-5">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6">
+                    <h5 class="mb-3">Cotizador de Créditos Asefimex</h5>
+                    <!-- <p class="mb-0">Herramienta profesional para calcular financiamiento de vehículos</p> -->
+                </div>
+                <div class="col-md-6 text-md-end">
+                    <p class="mb-1"><i class="bi bi-telephone me-2"></i>9615792121</p>
+                    <p class="mb-0"><i class="bi bi-envelope me-2"></i>ventas@asefimex.com</p>
+                </div>
+            </div>
+            <hr class="my-3">
+            <div class="text-center">
+                <p class="mb-0">&copy; 2023 Cotizador de Créditos para Autos. Asefimex Financiera.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="index.js"></script>
+</body>
+</html>
