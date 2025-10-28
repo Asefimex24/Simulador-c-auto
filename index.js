@@ -299,7 +299,7 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     
-// Exportar a PDF - Versión Completa con Todos los Pagos
+// Exportar a PDF - Versión Mejorada
 function exportToPDF() {
     if (!loanData.carType) {
         alert('Primero debes calcular un crédito para poder exportar a PDF');
@@ -313,149 +313,169 @@ function exportToPDF() {
     const pageWidth = doc.internal.pageSize.getWidth();
     const pageHeight = doc.internal.pageSize.getHeight();
     let currentPage = 1;
-    let totalPages = 1;
-
-    // Calcular cuántas páginas necesitaremos para la tabla
-    const rowsPerPage = Math.floor((pageHeight - 120) / 8); // Aprox 8px por fila
-    totalPages = Math.ceil(loanData.totalPayments / rowsPerPage);
+    
+    // Calcular total de páginas aproximado
+    const rowsPerPage = Math.floor((pageHeight - 120) / 8);
+    const totalPages = Math.ceil(loanData.totalPayments / rowsPerPage);
 
     function addHeader(y) {
-        // Título
-        doc.setFontSize(16);
+        // Logo o título principal
+        doc.setFontSize(18);
         doc.setTextColor(44, 62, 80);
-        doc.text('Cotización de Crédito para Auto', margin, y);
-        y += 5;
+        doc.text('COTIZACIÓN DE CRÉDITO AUTOMOTRIZ', pageWidth / 2, y, { align: 'center' });
+        y += 8;
         
-        // Línea separadora
-        doc.setDrawColor(200, 200, 200);
+        // Línea decorativa
+        doc.setDrawColor(44, 62, 80);
+        doc.setLineWidth(0.5);
         doc.line(margin, y, pageWidth - margin, y);
-        y += 10;
+        y += 12;
         
         return y;
     }
 
-    function addCreditInfo(y) {
-        // Información del crédito (solo en primera página)
-        doc.setFontSize(10);
+    function addCreditSummary(y) {
+        // Información resumida del crédito
+        doc.setFontSize(11);
         doc.setTextColor(0, 0, 0);
-
-        // Datos generales
-        doc.setFont(undefined, 'bold');
-        doc.text('DATOS DEL CRÉDITO', margin, y);
-        y += 6;
-
-        doc.setFont(undefined, 'normal');
-        const leftColumn = [
-            `Tipo de Auto: ${getCarTypeText(loanData.carType)}`,
-            `Valor del Auto: ${formatCurrency(loanData.carValue)}`,
-            `Enganche: ${formatCurrency(loanData.downPayment)}`,
-            `Monto a Financiar: ${formatCurrency(loanData.loanAmount)}`
-        ];
-
-        const rightColumn = [
-            `Plazo: ${loanData.loanTerm} meses`,
-            `Frecuencia: ${getFrequencyText(loanData.paymentFrequency)}`,
-            `Tasa Anual: ${loanData.annualInterestRate.toFixed(2)}%`,
-            `Total a Pagar: ${formatCurrency(loanData.totalPayment)}`
-        ];
-
-        // Información en dos columnas
-        leftColumn.forEach((text, index) => {
-            doc.text(text, margin, y);
-            if (rightColumn[index]) {
-                doc.text(rightColumn[index], pageWidth / 2, y);
-            }
-            y += 5;
-        });
-
-        y += 8;
         
-        // Resumen financiero
+        // Panel izquierdo - Datos del vehículo
+        doc.setFillColor(245, 245, 245);
+        doc.rect(margin, y, (pageWidth / 2) - margin - 5, 45, 'F');
+        
         doc.setFont(undefined, 'bold');
-        doc.text('RESUMEN FINANCIERO', margin, y);
-        y += 6;
-
+        doc.text('DATOS DEL VEHÍCULO', margin + 5, y + 8);
         doc.setFont(undefined, 'normal');
-        const financialData = [
-            `Pago por Periodo: ${formatCurrency(loanData.paymentAmount)}`,
-            `Intereses Totales: ${formatCurrency(loanData.totalInterest)}`,
-            `Coste Total del Auto: ${formatCurrency(loanData.totalCost)}`
-        ];
-
-        financialData.forEach(text => {
-            doc.text(text, margin, y);
-            y += 5;
-        });
-
-        return y + 10;
+        doc.text(`Tipo: ${getCarTypeText(loanData.carType)}`, margin + 5, y + 15);
+        doc.text(`Valor: ${formatCurrency(loanData.carValue)}`, margin + 5, y + 22);
+        doc.text(`Enganche: ${formatCurrency(loanData.downPayment)}`, margin + 5, y + 29);
+        doc.text(`A financiar: ${formatCurrency(loanData.loanAmount)}`, margin + 5, y + 36);
+        
+        // Panel derecho - Términos del crédito
+        doc.setFillColor(245, 245, 245);
+        doc.rect(pageWidth / 2 + 5, y, (pageWidth / 2) - margin - 5, 45, 'F');
+        
+        doc.setFont(undefined, 'bold');
+        doc.text('TÉRMINOS DEL CRÉDITO', pageWidth / 2 + 10, y + 8);
+        doc.setFont(undefined, 'normal');
+        doc.text(`Plazo: ${loanData.loanTerm} meses`, pageWidth / 2 + 10, y + 15);
+        doc.text(`Frecuencia: ${getFrequencyText(loanData.paymentFrequency)}`, pageWidth / 2 + 10, y + 22);
+        doc.text(`Tasa anual: ${loanData.annualInterestRate.toFixed(2)}%`, pageWidth / 2 + 10, y + 29);
+        doc.text(`Total pagos: ${loanData.totalPayments}`, pageWidth / 2 + 10, y + 36);
+        
+        y += 50;
+        
+        // Resumen financiero en una sola línea
+        doc.setFillColor(44, 62, 80);
+        doc.rect(margin, y, pageWidth - (2 * margin), 12, 'F');
+        
+        doc.setFont(undefined, 'bold');
+        doc.setTextColor(255, 255, 255);
+        const summaryText = `PAGO ${getFrequencyText(loanData.paymentFrequency).toUpperCase()}: ${formatCurrency(loanData.paymentAmount)} | TOTAL A PAGAR: ${formatCurrency(loanData.totalPayment)} | INTERESES: ${formatCurrency(loanData.totalInterest)}`;
+        doc.text(summaryText, pageWidth / 2, y + 8, { align: 'center' });
+        
+        return y + 20;
     }
 
     function addTableHeader(y) {
-        // Encabezados de la tabla
+        // Encabezado de tabla mejorado
+        doc.setFillColor(60, 80, 100);
+        doc.rect(margin, y, pageWidth - (2 * margin), 8, 'F');
+        
         doc.setFont(undefined, 'bold');
         doc.setFontSize(8);
+        doc.setTextColor(255, 255, 255);
         
-        doc.text('No.', margin, y);
-        doc.text('Fecha', margin + 15, y);
-        doc.text('Pago', margin + 45, y);
-        doc.text('Interés', margin + 65, y);
-        doc.text('Capital', margin + 85, y);
-        doc.text('Saldo Restante', margin + 105, y);
+        const columns = [
+            { text: 'PAGO', x: margin + 3 },
+            { text: 'FECHA', x: margin + 20 },
+            { text: 'PAGO', x: margin + 50 },
+            { text: 'INTERÉS', x: margin + 75 },
+            { text: 'CAPITAL', x: margin + 100 },
+            { text: 'SALDO', x: margin + 125 }
+        ];
         
-        // Línea debajo del encabezado
-        doc.setDrawColor(100, 100, 100);
-        doc.line(margin, y + 2, pageWidth - margin, y + 2);
+        columns.forEach(col => {
+            doc.text(col.text, col.x, y + 5);
+        });
         
-        return y + 5;
+        return y + 10;
     }
 
-    function addFooter(pageNum) {
+    function addFooter() {
         const footerY = pageHeight - 15;
         doc.setFontSize(8);
         doc.setTextColor(100, 100, 100);
         
-        // Fecha de generación
-        doc.text(`Generado: ${new Date().toLocaleDateString('es-MX')}`, margin, footerY);
+        // Información izquierda
+        doc.text(`Documento generado el ${new Date().toLocaleDateString('es-MX', { 
+            year: 'numeric', 
+            month: 'long', 
+            day: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit'
+        })}`, margin, footerY);
         
-        // Número de página
-        doc.text(`Página ${pageNum} de ${totalPages}`, pageWidth - margin - 20, footerY);
+        // Información derecha
+        doc.text(`Página ${currentPage} de ${totalPages}`, pageWidth - margin - 20, footerY);
+        
+        // Leyenda importante
+        if (currentPage === totalPages) {
+            doc.setFontSize(7);
+            doc.setTextColor(150, 150, 150);
+            doc.text('* Esta cotización es informativa y está sujeta a aprobación crediticia.', margin, footerY + 5);
+        }
     }
 
-    // PRIMERA PÁGINA
+    function highlightCurrentRow(y, paymentNumber) {
+        // Resaltar cada 5 filas para mejor lectura
+        if (paymentNumber % 5 === 0) {
+            doc.setFillColor(250, 250, 250);
+            doc.rect(margin, y - 3, pageWidth - (2 * margin), 4, 'F');
+        }
+    }
+
+    // ===== GENERACIÓN DEL DOCUMENTO =====
+    
     let y = 25;
     y = addHeader(y);
-    y = addCreditInfo(y);
+    y = addCreditSummary(y);
     
     // Título de la tabla
     doc.setFont(undefined, 'bold');
     doc.setFontSize(12);
-    doc.text('TABLA DE AMORTIZACIÓN COMPLETA', margin, y);
+    doc.setTextColor(44, 62, 80);
+    doc.text('DETALLE DE PAGOS - TABLA DE AMORTIZACIÓN', pageWidth / 2, y, { align: 'center' });
     y += 8;
     
     y = addTableHeader(y);
     
-    // Generar datos de amortización
+    // Generar todos los pagos
     let balance = loanData.loanAmount;
     let today = new Date();
     const periodicInterestRate = loanData.annualInterestRate / 100 / (loanData.paymentFrequency === 'semanal' ? 52 :
         loanData.paymentFrequency === 'quincenal' ? 24 :
         loanData.paymentFrequency === 'mensual' ? 12 : 4);
 
-    // Mostrar TODOS los pagos
+    let totalInterestPaid = 0;
+    let totalPrincipalPaid = 0;
+
     for (let i = 1; i <= loanData.totalPayments; i++) {
         // Verificar si necesitamos nueva página
-        if (y > pageHeight - 20) {
-            addFooter(currentPage);
+        if (y > pageHeight - 25) {
+            addFooter();
             doc.addPage();
             currentPage++;
             y = 25;
-            y = addHeader(y);
             y = addTableHeader(y);
         }
         
         const interest = balance * periodicInterestRate;
         const principal = loanData.paymentAmount - interest;
         balance -= principal;
+        
+        totalInterestPaid += interest;
+        totalPrincipalPaid += principal;
 
         // Ajuste para el último pago
         if (i === loanData.totalPayments) {
@@ -464,34 +484,63 @@ function exportToPDF() {
 
         const paymentDate = calculateNextPaymentDate(today, i, loanData.paymentFrequency);
         
+        // Resaltar fila cada 5 pagos
+        highlightCurrentRow(y, i);
+        
         // Agregar fila de pago
         doc.setFont(undefined, 'normal');
         doc.setFontSize(7);
+        doc.setTextColor(0, 0, 0);
         
-        doc.text(i.toString(), margin, y);
-        doc.text(formatDate(paymentDate), margin + 15, y);
-        doc.text(formatCurrency(loanData.paymentAmount), margin + 45, y);
-        doc.text(formatCurrency(interest), margin + 65, y);
-        doc.text(formatCurrency(principal), margin + 85, y);
-        doc.text(formatCurrency(balance), margin + 105, y);
+        // Color diferente para el último pago
+        if (i === loanData.totalPayments) {
+            doc.setFont(undefined, 'bold');
+            doc.setTextColor(44, 62, 80);
+        }
+        
+        doc.text(i.toString(), margin + 3, y);
+        doc.text(formatDate(paymentDate), margin + 20, y);
+        doc.text(formatCurrency(loanData.paymentAmount), margin + 50, y);
+        doc.text(formatCurrency(interest), margin + 75, y);
+        doc.text(formatCurrency(principal), margin + 100, y);
+        doc.text(formatCurrency(balance), margin + 125, y);
         
         y += 4;
         
-        // Línea separadora entre filas
-        if (i < loanData.totalPayments) {
-            doc.setDrawColor(240, 240, 240);
-            doc.line(margin, y + 1, pageWidth - margin, y + 1);
-            y += 3;
-        }
+        // Línea separadora sutil
+        doc.setDrawColor(230, 230, 230);
+        doc.line(margin, y + 1, pageWidth - margin, y + 1);
+        y += 3;
     }
 
-    // Agregar footer a la última página
-    addFooter(currentPage);
+    // Resumen final en la última página
+    if (y < pageHeight - 40) {
+        y += 10;
+        doc.setFillColor(240, 240, 240);
+        doc.rect(margin, y, pageWidth - (2 * margin), 20, 'F');
+        
+        doc.setFontSize(9);
+        doc.setFont(undefined, 'bold');
+        doc.setTextColor(0, 0, 0);
+        doc.text('RESUMEN EJECUTIVO:', margin + 5, y + 8);
+        
+        doc.setFont(undefined, 'normal');
+        doc.text(`Total intereses pagados: ${formatCurrency(totalInterestPaid)}`, margin + 5, y + 15);
+        doc.text(`Total capital pagado: ${formatCurrency(totalPrincipalPaid)}`, margin + 100, y + 15);
+    }
 
-    // Guardar el PDF
-    doc.save(`cotizacion_credito_auto_${new Date().toISOString().slice(0, 10)}.pdf`);
+    // Agregar footer final
+    addFooter();
+
+    // Guardar el PDF con nombre más descriptivo
+    const fileName = `Cotización_Crédito_${getCarTypeText(loanData.carType).replace(/\s+/g, '_')}_${loanData.loanTerm}meses_${new Date().toISOString().slice(0, 10)}.pdf`;
+    doc.save(fileName);
+    
+    // Opcional: Mostrar mensaje de éxito
+    setTimeout(() => {
+        alert('PDF generado exitosamente con todos los pagos');
+    }, 500);
 }
-
     // Obtener texto del tipo de auto
     function getCarTypeText(carType) {
         const carTypes = {
