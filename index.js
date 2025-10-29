@@ -66,10 +66,7 @@ document.addEventListener('DOMContentLoaded', function () {
         exportToPDF();
     });
 
-    // Manejar impresión
-    printResultsBtn.addEventListener('click', function () {
-        window.print();
-    });
+ 
 
     // Establecer la fecha de validez de la cotización  
     function fecha_validezcotizacion() {
@@ -536,10 +533,6 @@ function exportToPDF() {
     const fileName = `Cotización_Crédito_${getCarTypeText(loanData.carType).replace(/\s+/g, '_')}_${loanData.loanTerm}meses_${new Date().toISOString().slice(0, 10)}.pdf`;
     doc.save(fileName);
     
-    // Opcional: Mostrar mensaje de éxito
-    setTimeout(() => {
-        alert('PDF generado exitosamente con todos los pagos');
-    }, 500);
 }
     // Obtener texto del tipo de auto
     function getCarTypeText(carType) {
