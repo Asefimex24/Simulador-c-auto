@@ -319,7 +319,7 @@ function exportToPDF() {
         // Logo o título principal
         doc.setFontSize(18);
         doc.setTextColor(44, 62, 80);
-        doc.text('COTIZACIÓN DE CRÉDITO AUTOMOTRIZ', pageWidth / 2, y, { align: 'center' });
+        doc.text('Asefimex: Cotización de crédito Automotriz', pageWidth / 2, y, { align: 'center' });
         y += 8;
         
         // Línea decorativa
