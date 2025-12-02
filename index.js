@@ -39,8 +39,10 @@ document.addEventListener('DOMContentLoaded', function () {
 
         //valor del vehiculo
         const carValue = parseFloat(document.getElementById('car-value').value);
+
         //valor del enganche
         const downPayment = parseFloat(document.getElementById('down-payment').value);
+
         //etiqueta de error para enganche
         const downPaymentError = document.getElementById('down-payment-error');
 
@@ -82,45 +84,56 @@ document.addEventListener('DOMContentLoaded', function () {
         // Obtener valores del formulario
         //tipo de vehiculo
         const carType = document.getElementById('car-type').value;
+
         //valor del vehiculo
         const carValue = parseFloat(document.getElementById('car-value').value);
+
         //valor del enganche
         const downPayment = parseFloat(document.getElementById('down-payment').value);
+
         //plazo del credito
         const loanTerm = parseInt(document.getElementById('loan-term').value);
+        
         //frecuencia de pago
         const paymentFrequency = document.getElementById('payment-frequency').value;
         
+        //calcular la tasa de interes diaria
+
+        const dailyInterestRate = (parseFloat(document.getElementById('interest-rate').value)) / 100 / 360;
+        
+
         //tasa de interes anual
-        const annualInterestRate = parseFloat(document.getElementById('interest-rate').value) / 100;
+        const annualInterestRate = (parseFloat(document.getElementById('interest-rate').value)) / 100;
 
         // Calcular monto a financiar
         const loanAmount = carValue - downPayment;
 
         // Determinar número de pagos por año según frecuencia
-        let paymentsPerYear;
-        switch (paymentFrequency) {
-            case 'semanal':
-                paymentsPerYear = 52;
-                break;
-            case 'quincenal':
-                paymentsPerYear = 24;
-                break;
-            case 'mensual':
-                paymentsPerYear = 12;
-                break;
-            case 'trimestral':
-                paymentsPerYear = 4;
-                break;
-                case 'semestral':
-                paymentsPerYear = 2;
-                break;
-                case 'anual':
-                paymentsPerYear = 1;
-                break;  
-            default:
-                paymentsPerYear = 12;
-        }
+        let paymentsPerYear= 12;
+
+
+        // switch (paymentFrequency) {
+        //     case 'semanal':
+        //         paymentsPerYear = 52;
+        //         break;
+        //     case 'quincenal':
+        //         paymentsPerYear = 24;
+        //         break;
+        //     case 'mensual':
+        //         paymentsPerYear = 12;
+        //         break;
+        //     case 'trimestral':
+        //         paymentsPerYear = 4;
+        //         break;
+        //         case 'semestral':
+        //         paymentsPerYear = 2;
+        //         break;
+        //         case 'anual':
+        //         paymentsPerYear = 1;
+        //         break;
+        //     default:
+        //         paymentsPerYear = 12;
+        // }
 
         // Calcular tasa de interés por periodo
         const periodicInterestRate = annualInterestRate / paymentsPerYear;
@@ -132,25 +145,28 @@ document.addEventListener('DOMContentLoaded', function () {
         let paymentAmount;
 
         if (periodicInterestRate === 0) {
+
             paymentAmount = loanAmount / totalPayments;
+
         } else {
 
             paymentAmount = (loanAmount * periodicInterestRate / (1 - Math.pow(1 + periodicInterestRate, -totalPayments)));
+
             switch (loanTerm) {
                 case 12:
-                    paymentAmount = paymentAmount*1.005146;
+                    paymentAmount = paymentAmount;
                     break;
                 case 24:
-                    paymentAmount = paymentAmount*1.00718;
+                    paymentAmount = paymentAmount;
                     break;
                 case 36:
-                    paymentAmount = paymentAmount*1.00918;
+                    paymentAmount = paymentAmount;
                     break;
                 case 48:
-                    paymentAmount = paymentAmount*1.0108;
+                    paymentAmount = paymentAmount;
                     break;
                 case 60:
-                    paymentAmount = paymentAmount*1.01219;
+                    paymentAmount = paymentAmount;
                     break;
             }
         
@@ -216,6 +232,7 @@ document.addEventListener('DOMContentLoaded', function () {
         let today = new Date();
 
         for (let i = 1; i <= totalPayments; i++) {
+            
             // Calcular interés para este periodo
             const interest = balance * periodicInterestRate;
 
