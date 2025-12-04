@@ -39,6 +39,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
         //valor del vehiculo
         const carValue = parseFloat(document.getElementById('car-value').value);
+        
         //valor del enganche
         const downPayment = parseFloat(document.getElementById('down-payment').value);
         //etiqueta de error para enganche
@@ -103,21 +104,15 @@ document.addEventListener('DOMContentLoaded', function () {
             case 'semanal':
                 paymentsPerYear = 52;
                 break;
+            case 'catorcenal':
+                paymentsPerYear = 26;
+                break;
             case 'quincenal':
                 paymentsPerYear = 24;
                 break;
             case 'mensual':
                 paymentsPerYear = 12;
                 break;
-            case 'trimestral':
-                paymentsPerYear = 4;
-                break;
-                case 'semestral':
-                paymentsPerYear = 2;
-                break;
-                case 'anual':
-                paymentsPerYear = 1;
-                break;  
             default:
                 paymentsPerYear = 12;
         }
@@ -256,17 +251,14 @@ document.addEventListener('DOMContentLoaded', function () {
             case 'semanal':
                 date.setDate(date.getDate() + (paymentNumber * 7));
                 break;
+            case 'catorcenal':
+                date.setDate(date.getDate() + (paymentNumber * 14));
+                break;
             case 'quincenal':
                 date.setDate(date.getDate() + (paymentNumber * 15));
                 break;
             case 'mensual':
                 date.setMonth(date.getMonth() + paymentNumber);
-                break;
-            case 'trimestral':
-                date.setMonth(date.getMonth() + (paymentNumber * 3));
-                break;
-            case 'semestral':
-                date.setMonth(date.getMonth() + (paymentNumber * 6));
                 break;
         }
 
@@ -287,6 +279,7 @@ document.addEventListener('DOMContentLoaded', function () {
     function getFrequencyText(frequency) {
         const frequencies = {
             'semanal': 'Semanal',
+            'catorcenal': 'Catorcenal',
             'quincenal': 'Quincenal',
             'mensual': 'Mensual',
             'trimestral': 'Trimestral'

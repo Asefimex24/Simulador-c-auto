@@ -1,0 +1,595 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculadora de Crédito para Vehículos</title>
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.1/font/bootstrap-icons.css">
+    <style>
+        :root {
+            --primary-color: #0d6efd;
+            --secondary-color: #6c757d;
+            --success-color: #198754;
+            --light-bg: #f8f9fa;
+        }
+        
+        body {
+            background-color: #f5f7fa;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: #333;
+        }
+        
+        .calculator-container {
+            background-color: white;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+            padding: 25px;
+            margin-top: 20px;
+            margin-bottom: 40px;
+        }
+        
+        .header-section {
+            background: linear-gradient(135deg, var(--primary-color), #0a58ca);
+            color: white;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 25px;
+        }
+        
+        .input-group {
+            margin-bottom: 15px;
+        }
+        
+        .input-group label {
+            font-weight: 600;
+            margin-bottom: 5px;
+            color: #495057;
+        }
+        
+        .results-section {
+            background-color: var(--light-bg);
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 30px;
+            border-left: 5px solid var(--primary-color);
+        }
+        
+        .payment-table-container {
+            max-height: 400px;
+            overflow-y: auto;
+            margin-top: 20px;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+        }
+        
+        .table thead {
+            position: sticky;
+            top: 0;
+            background-color: var(--primary-color);
+            color: white;
+        }
+        
+        .summary-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px dashed #dee2e6;
+        }
+        
+        .summary-item.total {
+            font-weight: 700;
+            font-size: 1.1rem;
+            color: var(--primary-color);
+            border-bottom: 2px solid var(--primary-color);
+        }
+        
+        .btn-calculate {
+            background: linear-gradient(135deg, var(--primary-color), #0a58ca);
+            color: white;
+            font-weight: 600;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            transition: all 0.3s;
+        }
+        
+        .btn-calculate:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(13, 110, 253, 0.3);
+        }
+        
+        .brand-icon {
+            width: 40px;
+            height: 40px;
+            background-color: var(--primary-color);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 10px;
+        }
+        
+        .frequency-badge {
+            font-size: 0.8rem;
+            padding: 5px 10px;
+            border-radius: 20px;
+        }
+        
+        .form-control:focus, .form-select:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+        }
+        
+        @media (max-width: 768px) {
+            .calculator-container {
+                padding: 15px;
+            }
+            
+            .payment-table-container {
+                font-size: 0.85rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="calculator-container">
+            <!-- Encabezado -->
+            <div class="header-section">
+                <div class="d-flex align-items-center">
+                    <div class="brand-icon">
+                        <i class="bi bi-car-front-fill"></i>
+                    </div>
+                    <div>
+                        <h1 class="h3 mb-1">Calculadora de Crédito para Vehículos</h1>
+                        <p class="mb-0">Calcule su financiamiento con diferentes opciones de plazo y frecuencia de pago</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="row">
+                <!-- Formulario de entrada -->
+                <div class="col-lg-6">
+                    <form id="creditForm">
+                        <!-- Información del vehículo -->
+                        <div class="mb-4">
+                            <h4 class="mb-3"><i class="bi bi-car-front me-2"></i>Información del Vehículo</h4>
+                            
+                            <div class="input-group">
+                                <label for="vehicleBrand" class="form-label">Marca del vehículo</label>
+                                <select class="form-select" id="vehicleBrand" required>
+                                    <option value="" selected disabled>Seleccione una marca</option>
+                                    <option value="Toyota">Toyota</option>
+                                    <option value="Nissan">Nissan</option>
+                                    <option value="Honda">Honda</option>
+                                    <option value="Ford">Ford</option>
+                                    <option value="Chevrolet">Chevrolet</option>
+                                    <option value="Volkswagen">Volkswagen</option>
+                                    <option value="Mazda">Mazda</option>
+                                    <option value="Hyundai">Hyundai</option>
+                                    <option value="Kia">Kia</option>
+                                    <option value="Otra">Otra</option>
+                                </select>
+                            </div>
+                            
+                            <div class="input-group">
+                                <label for="vehicleType" class="form-label">Tipo de vehículo</label>
+                                <select class="form-select" id="vehicleType" required>
+                                    <option value="" selected disabled>Seleccione un tipo</option>
+                                    <option value="Sedán">Sedán</option>
+                                    <option value="SUV">SUV</option>
+                                    <option value="Camioneta">Camioneta</option>
+                                    <option value="Hatchback">Hatchback</option>
+                                    <option value="Pickup">Pickup</option>
+                                    <option value="Deportivo">Deportivo</option>
+                                    <option value="Van">Van</option>
+                                    <option value="Otro">Otro</option>
+                                </select>
+                            </div>
+                            
+                            <div class="input-group">
+                                <label for="vehiclePrice" class="form-label">Precio del vehículo ($)</label>
+                                <input type="number" class="form-control" id="vehiclePrice" min="50000" max="1000000" required>
+                                <div class="form-text">Ingrese el precio total del vehículo</div>
+                            </div>
+                        </div>
+                        
+                        <!-- Términos del crédito -->
+                        <div class="mb-4">
+                            <h4 class="mb-3"><i class="bi bi-calendar-check me-2"></i>Términos del Crédito</h4>
+                            
+                            <div class="input-group">
+                                <label for="downPayment" class="form-label">Enganche inicial ($)</label>
+                                <input type="number" class="form-control" id="downPayment" min="0" max="1000000"  required>
+                                <div class="form-text">Ingrese la cantidad inicial que pagará</div>
+                            </div>
+                            
+                            <div class="input-group">
+                                <label for="loanTerm" class="form-label">Plazo del crédito (meses)</label>
+                                <select class="form-select" id="loanTerm" required>
+                                    <option value="6">6 meses</option>
+                                    <option value="12" selected>12 meses</option>
+                                    <option value="24">24 meses</option>
+                                    <option value="36">36 meses</option>
+                                    <option value="48">48 meses</option>
+                                    <option value="60">60 meses</option>
+                                </select>
+                            </div>
+                            
+                            <div class="input-group">
+                                <label for="paymentFrequency" class="form-label">Frecuencia de pago</label>
+                                <select class="form-select" id="paymentFrequency" required>
+                                    <option value="semanal">Semanal</option>
+                                    <option value="catorcenal">Catorcenal</option>
+                                    <option value="quincenal" selected>Quincenal</option>
+                                    <option value="mensual">Mensual</option>
+                                </select>
+                            </div>
+                            
+                            <div class="input-group">
+                                <label for="interestRate" class="form-label">Tasa de interés anual (%)</label>
+                                <input type="number" class="form-control" id="interestRate" min="0" max="76"required>
+                                <div class="form-text">Tasa de interés anual para el financiamiento</div>
+                            </div>
+                            
+                            <div class="input-group">
+                                <label for="startDate" class="form-label">Fecha de inicio del crédito</label>
+                                <input type="date" class="form-control" id="startDate" required>
+                            </div>
+                        </div>
+                        
+                        <button type="submit" class="btn btn-calculate w-100 mt-2">
+                            <i class="bi bi-calculator me-2"></i>Calcular Crédito
+                        </button>
+                    </form>
+                </div>
+                
+                <!-- Resultados y tabla de pagos -->
+                <div class="col-lg-6">
+                    <!-- Resumen del crédito -->
+                    <div id="resultsSection" class="results-section" style="display: none;">
+                        <h4 class="mb-3"><i class="bi bi-card-checklist me-2"></i>Resumen del Crédito</h4>
+                        
+                        <div class="mb-3">
+                            <h5 id="vehicleInfo" class="h6 text-primary"></h5>
+                            <p id="creditTerms" class="mb-0 text-muted small"></p>
+                        </div>
+                        
+                        <div id="creditSummary">
+                            <!-- Resumen se llenará con JavaScript -->
+                        </div>
+                    </div>
+                    
+                    <!-- Tabla de pagos -->
+                    <div id="paymentTableSection" class="mt-4" style="display: none;">
+                        <h4 class="mb-3"><i class="bi bi-table me-2"></i>Tabla de Pagos (Amortización)</h4>
+                        
+                        <div class="payment-table-container">
+                            <table class="table table-hover table-sm" id="paymentTable">
+                                <thead>
+                                    <tr>
+                                        <th scope="col">#</th>
+                                        <th scope="col">Fecha</th>
+                                        <th scope="col">Pago</th>
+                                        <th scope="col">Interés</th>
+                                        <th scope="col">Capital</th>
+                                        <th scope="col">Saldo</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="paymentTableBody">
+                                    <!-- Filas se llenarán con JavaScript -->
+                                </tbody>
+                            </table>
+                        </div>
+                        
+                        <div class="mt-3 text-end">
+                            <button id="exportBtn" class="btn btn-outline-primary btn-sm">
+                                <i class="bi bi-download me-1"></i>Exportar a CSV
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- Mensaje inicial -->
+                    <div id="initialMessage" class="text-center mt-5">
+                        <div class="mb-4">
+                            <i class="bi bi-calculator display-1 text-muted"></i>
+                        </div>
+                        <h4 class="text-muted">Complete el formulario</h4>
+                        <p class="text-muted">Ingrese los datos del vehículo y los términos del crédito para calcular su financiamiento.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <footer class="text-center text-muted mb-4">
+            <p>Calculadora de Crédito para Vehículos &copy; 2023 | Esta herramienta es solo para fines ilustrativos.</p>
+        </footer>
+    </div>
+
+    <!-- Bootstrap 5 JS Bundle with Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        // Establecer fecha mínima como hoy
+        document.addEventListener('DOMContentLoaded', function() {
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('startDate').value = today;
+            document.getElementById('startDate').min = today;
+        });
+        
+        // Calcular crédito cuando se envíe el formulario
+        document.getElementById('creditForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            calculateCredit();
+        });
+        
+        // Función principal para calcular el crédito
+        function calculateCredit() {
+            // Obtener valores del formulario
+            const vehicleBrand = document.getElementById('vehicleBrand').value;
+            const vehicleType = document.getElementById('vehicleType').value;
+            const vehiclePrice = parseFloat(document.getElementById('vehiclePrice').value);
+            const downPayment = parseFloat(document.getElementById('downPayment').value);
+            const loanTerm = parseInt(document.getElementById('loanTerm').value);
+            const paymentFrequency = document.getElementById('paymentFrequency').value;
+            const interestRate = parseFloat(document.getElementById('interestRate').value);
+            const startDate = new Date(document.getElementById('startDate').value);
+            
+            // Validaciones básicas
+            if (downPayment >= vehiclePrice) {
+                alert('El enganche debe ser menor al precio del vehículo');
+                return;
+            }
+            
+            // Calcular monto del crédito
+            const loanAmount = vehiclePrice - downPayment;
+            
+            // Calcular pagos según frecuencia
+            let paymentsPerYear, paymentLabel;
+            switch(paymentFrequency) {
+                case 'semanal':
+                    paymentsPerYear = 52;
+                    paymentLabel = 'semanal';
+                    break;
+                case 'catorcenal':
+                    paymentsPerYear = 26;
+                    paymentLabel = 'catorcenal';
+                    break;
+                case 'quincenal':
+                    paymentsPerYear = 24;
+                    paymentLabel = 'quincenal';
+                    break;
+                case 'mensual':
+                    paymentsPerYear = 12;
+                    paymentLabel = 'mensual';
+                    break;
+            }
+            
+            // Calcular número total de pagos
+            const totalPayments = Math.ceil(loanTerm * (paymentsPerYear / 12));
+            
+            // Calcular tasa de interés por periodo
+            const periodicInterestRate = (interestRate / 100) / paymentsPerYear;
+            
+            // Calcular pago periódico usando fórmula de anualidad
+            let periodicPayment;
+            if (periodicInterestRate === 0) {
+                periodicPayment = loanAmount / totalPayments;
+            } else {
+                periodicPayment = loanAmount * (periodicInterestRate * Math.pow(1 + periodicInterestRate, totalPayments)) / (Math.pow(1 + periodicInterestRate, totalPayments) - 1);
+            }
+            
+            // Calcular total a pagar e interés total
+            const totalPayment = periodicPayment * totalPayments;
+            const totalInterest = totalPayment - loanAmount;
+            
+            // Mostrar secciones de resultados
+            document.getElementById('resultsSection').style.display = 'block';
+            document.getElementById('paymentTableSection').style.display = 'block';
+            document.getElementById('initialMessage').style.display = 'none';
+            
+            // Actualizar información del vehículo
+            document.getElementById('vehicleInfo').textContent = `${vehicleBrand} - ${vehicleType}`;
+            document.getElementById('creditTerms').textContent = `Crédito a ${loanTerm} meses con pagos ${paymentLabel}es`;
+            
+            // Mostrar resumen del crédito
+            const summaryHTML = `
+                <div class="summary-item">
+                    <span>Precio del vehículo:</span>
+                    <span>$${vehiclePrice.toLocaleString('es-MX', {minimumFractionDigits: 2})}</span>
+                </div>
+                <div class="summary-item">
+                    <span>Enganche inicial:</span>
+                    <span>$${downPayment.toLocaleString('es-MX', {minimumFractionDigits: 2})}</span>
+                </div>
+                <div class="summary-item">
+                    <span>Monto del crédito:</span>
+                    <span>$${loanAmount.toLocaleString('es-MX', {minimumFractionDigits: 2})}</span>
+                </div>
+                <div class="summary-item">
+                    <span>Tasa de interés anual:</span>
+                    <span>${interestRate.toFixed(2)}%</span>
+                </div>
+                <div class="summary-item">
+                    <span>Pago ${paymentLabel}:</span>
+                    <span>$${periodicPayment.toLocaleString('es-MX', {minimumFractionDigits: 2})}</span>
+                </div>
+                <div class="summary-item">
+                    <span>Total de pagos:</span>
+                    <span>${totalPayments}</span>
+                </div>
+                <div class="summary-item">
+                    <span>Interés total:</span>
+                    <span>$${totalInterest.toLocaleString('es-MX', {minimumFractionDigits: 2})}</span>
+                </div>
+                <div class="summary-item total">
+                    <span>Total a pagar:</span>
+                    <span>$${totalPayment.toLocaleString('es-MX', {minimumFractionDigits: 2})}</span>
+                </div>
+            `;
+            
+            document.getElementById('creditSummary').innerHTML = summaryHTML;
+            
+            // Generar tabla de amortización
+            generateAmortizationTable(loanAmount, periodicPayment, periodicInterestRate, totalPayments, startDate, paymentFrequency);
+        }
+        
+        // Función para generar tabla de amortización
+        function generateAmortizationTable(loanAmount, periodicPayment, periodicInterestRate, totalPayments, startDate, paymentFrequency) {
+            const tableBody = document.getElementById('paymentTableBody');
+            tableBody.innerHTML = '';
+            
+            let balance = loanAmount;
+            let currentDate = new Date(startDate);
+            
+            // Calcular incremento de días según frecuencia
+            let daysToAdd = 0;
+            switch(paymentFrequency) {
+                case 'semanal':
+                    daysToAdd = 7;
+                    break;
+                case 'catorcenal':
+                    daysToAdd = 14;
+                    break;
+                case 'quincenal':
+                    daysToAdd = 15;
+                    break;
+                case 'mensual':
+                    daysToAdd = 30; // Aproximado
+                    break;
+            }
+            
+            for (let i = 1; i <= totalPayments; i++) {
+                // Calcular interés para este periodo
+                const interest = balance * periodicInterestRate;
+                
+                // Calcular pago a capital
+                const principal = periodicPayment - interest;
+                
+                // Actualizar saldo
+                balance -= principal;
+                
+                // Asegurarse de que el último pago ajuste cualquier discrepancia
+                let payment = periodicPayment;
+                let finalPrincipal = principal;
+                let finalInterest = interest;
+                
+                if (i === totalPayments) {
+                    // Último pago: ajustar para saldar completamente
+                    payment = balance + interest;
+                    finalPrincipal = balance;
+                    finalInterest = interest;
+                    balance = 0;
+                }
+                
+                // Formatear fecha
+                const formattedDate = currentDate.toLocaleDateString('es-MX');
+                
+                // Crear fila de la tabla
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${i}</td>
+                    <td>${formattedDate}</td>
+                    <td>$${payment.toLocaleString('es-MX', {minimumFractionDigits: 2})}</td>
+                    <td>$${finalInterest.toLocaleString('es-MX', {minimumFractionDigits: 2})}</td>
+                    <td>$${finalPrincipal.toLocaleString('es-MX', {minimumFractionDigits: 2})}</td>
+                    <td>$${balance.toLocaleString('es-MX', {minimumFractionDigits: 2})}</td>
+                `;
+                
+                tableBody.appendChild(row);
+                
+                // Incrementar fecha para el siguiente pago
+                currentDate.setDate(currentDate.getDate() + daysToAdd);
+            }
+            
+            // Configurar botón de exportación
+            document.getElementById('exportBtn').onclick = function() {
+                exportToCSV(loanAmount, periodicPayment, periodicInterestRate, totalPayments, startDate, paymentFrequency);
+            };
+        }
+        
+        // Función para exportar a CSV
+        function exportToCSV(loanAmount, periodicPayment, periodicInterestRate, totalPayments, startDate, paymentFrequency) {
+            let csvContent = "No.,Fecha,Pago,Interés,Capital,Saldo\n";
+            
+            let balance = loanAmount;
+            let currentDate = new Date(startDate);
+            
+            // Calcular incremento de días según frecuencia
+            let daysToAdd = 0;
+            switch(paymentFrequency) {
+                case 'semanal':
+                    daysToAdd = 7;
+                    break;
+                case 'catorcenal':
+                    daysToAdd = 14;
+                    break;
+                case 'quincenal':
+                    daysToAdd = 15;
+                    break;
+                case 'mensual':
+                    daysToAdd = 30;
+                    break;
+            }
+            
+            for (let i = 1; i <= totalPayments; i++) {
+                // Calcular interés para este periodo
+                const interest = balance * periodicInterestRate;
+                
+                // Calcular pago a capital
+                const principal = periodicPayment - interest;
+                
+                // Actualizar saldo
+                balance -= principal;
+                
+                // Ajustar último pago
+                let payment = periodicPayment;
+                let finalPrincipal = principal;
+                let finalInterest = interest;
+                
+                if (i === totalPayments) {
+                    payment = balance + interest;
+                    finalPrincipal = balance;
+                    finalInterest = interest;
+                    balance = 0;
+                }
+                
+                // Formatear fecha
+                const formattedDate = currentDate.toLocaleDateString('es-MX');
+                
+                // Agregar fila al CSV
+                csvContent += `${i},"${formattedDate}",${payment.toFixed(2)},${finalInterest.toFixed(2)},${finalPrincipal.toFixed(2)},${balance.toFixed(2)}\n`;
+                
+                // Incrementar fecha para el siguiente pago
+                currentDate.setDate(currentDate.getDate() + daysToAdd);
+            }
+            
+            // Crear y descargar archivo CSV
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.setAttribute('href', url);
+            link.setAttribute('download', 'tabla_amortizacion_credito.csv');
+            link.style.visibility = 'hidden';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+        
+        // Ejecutar cálculo inicial al cargar la página
+        document.addEventListener('DOMContentLoaded', function() {
+            // Prellenar algunos campos para facilitar la demostración
+            document.getElementById('vehicleBrand').value = 'Toyota';
+            document.getElementById('vehicleType').value = 'SUV';
+            
+            // Calcular automáticamente después de un breve retraso para mostrar funcionalidad
+            setTimeout(() => {
+                calculateCredit();
+            }, 500);
+        });
+    </script>
+</body>
+</html>
