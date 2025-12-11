@@ -1,10 +1,10 @@
 <?php
 // config/database.php - Configuración de la base de datos
 class Database {
-    private $host = '172.30.1.229';
+    private $host = 'localhost';
     private $db_name = 'cotizador';
-    private $username = 'ever2812';
-    private $password = '123456';
+    private $username = 'root';
+    private $password = '';
     private $conn;
 
     public function getConnection() {

@@ -23,7 +23,7 @@ async function get_Marcas() {
                 selectmarcas.appendChild(option);
             });
 
-            console.log('Marcas cargados:', data.data.length);
+            // console.log('Marcas cargados:', data.data.length);
         } else {
             throw new Error(data.message || 'No se pudieron cargar los niveles');
         }

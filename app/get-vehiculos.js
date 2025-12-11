@@ -44,7 +44,7 @@ async function cargarVehiculos(marca) {
                 selectVehiculos.appendChild(option);
             });
 
-            console.log(`vehiculos cargados ${marca}:`, data.data.length);
+            // console.log(`vehiculos cargados ${marca}:`, data.data.length);
         } else {
             throw new Error(data.message || 'No se encontraron municipios para este estado');
         }
